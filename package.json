@@ -1,0 +1,25 @@
+{
+  "name": "tasvir",
+  "version": "1.0.0",
+  "description": "image resizing web app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/harviuec/tasvir.git"
+  },
+  "author": "Harvinder Singh",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/harviuec/tasvir/issues"
+  },
+  "homepage": "https://github.com/harviuec/tasvir#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "jimp": "^0.5.4",
+    "multer": "^1.4.1"
+  }
+}

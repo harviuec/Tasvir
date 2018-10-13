@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tasvir</title>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+</head>
+<body>
+<input type="file" id="myFile" accept = "image/jpeg, image/png" onchange="uploadImage()">
+<div id="result"></div>
+<script>
+  function uploadImage() {
+    const fileContainer = document.getElementById('myFile');
+    const file = fileContainer.files && (fileContainer.files.length > 0) && fileContainer.files[0];
+    const filedata = new FormData();
+    filedata.append('image', file);
+    if (file) {
+      console.log(file);
+      $.ajax({
+        url: 'http://localhost:3000/resize',
+        type: 'post',
+        data: filedata,
+        cache: false,
+        contentType: false,
+        processData: false,
+        success: (response) => {
+          $('#result')[0].innerHTML = response;
+          console.log(response);
+        },
+        error: (err) => {
+          console.error(err);
+        }
+      });
+    }
+  }
+</script>
+</body>
+</html>
