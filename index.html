@@ -6,7 +6,13 @@
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
 </head>
 <body>
-<input type="file" id="myFile" accept = "image/jpeg, image/png" onchange="uploadImage()">
+<input type="file" id="myFile" accept="image/jpeg, image/png" onchange="uploadImage()">
+<div>
+    <div id="originalSize">
+    </div>
+    <div id="changedSize">
+    </div>
+</div>
 <div id="result"></div>
 <script>
   function uploadImage() {
@@ -24,7 +30,9 @@
         contentType: false,
         processData: false,
         success: (response) => {
-          $('#result')[0].innerHTML = response;
+          $('#originalSize')[0].innerHTML = 'Original Dimensions: ' + response.width + 'x' + response.height;
+          $('#changedSize')[0].innerHTML = 'New Dimensions:' + response.newDimension + 'x' + response.newDimension;
+          $('#result')[0].innerHTML = '<img src="' + response.data + '" />';
           console.log(response);
         },
         error: (err) => {

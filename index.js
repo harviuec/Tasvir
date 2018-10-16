@@ -20,10 +20,12 @@ app.post('/resize', multer.single('image'), (req, res) => {
     }
     image.resize(newDimension, newDimension);
     image.getBase64Async(imageMime).then((buffer) => {
-      res.writeHead(200, {'Content-Type': 'text/html'});
-      res.write('<img src="');
-      res.write(buffer);
-      res.end('" />');
+      res.send({
+        width,
+        height,
+        newDimension,
+        data: buffer
+      });
     });
   }).catch(err => {
     res.send(err);
