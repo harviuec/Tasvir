@@ -18,8 +18,12 @@
   },
   "homepage": "https://github.com/harviuec/tasvir#readme",
   "dependencies": {
+    "bcrypt": "^3.0.2",
+    "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "jimp": "^0.5.4",
-    "multer": "^1.4.1"
+    "mongoose": "^5.3.11",
+    "multer": "^1.4.1",
+    "xss": "^1.0.3"
   }
 }

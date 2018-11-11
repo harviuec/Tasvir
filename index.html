@@ -6,24 +6,23 @@
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
 </head>
 <body>
-<input type="file" id="myFile" accept="image/jpeg, image/png" onchange="uploadImage()">
-<div>
-    <div id="originalSize">
-    </div>
-    <div id="changedSize">
-    </div>
-</div>
-<div id="result"></div>
+<div id="body"></div>
+</body>
 <script>
+  let userName;
+  let password;
   function uploadImage() {
+    const newSize = $('#photosize')[0].value;
     const fileContainer = document.getElementById('myFile');
     const file = fileContainer.files && (fileContainer.files.length > 0) && fileContainer.files[0];
     const filedata = new FormData();
     filedata.append('image', file);
+    filedata.append('newSize', newSize);
+    filedata.append('userName', userName);
+    filedata.append('password', password);
     if (file) {
-      console.log(file);
       $.ajax({
-        url: 'http://localhost:3000/resize',
+        url: '/resize',
         type: 'post',
         data: filedata,
         cache: false,
@@ -33,14 +32,81 @@
           $('#originalSize')[0].innerHTML = 'Original Dimensions: ' + response.width + 'x' + response.height;
           $('#changedSize')[0].innerHTML = 'New Dimensions:' + response.newDimension + 'x' + response.newDimension;
           $('#result')[0].innerHTML = '<img src="' + response.data + '" />';
-          console.log(response);
         },
         error: (err) => {
-          console.error(err);
+          $('#result')[0].innerHTML = 'Cannot resize this file';
         }
       });
     }
   }
+
+  function getUserDetails() {
+    const userName = document.getElementById('userName').value;
+    const password = document.getElementById('password').value;
+    checkValues(userName, password);
+    return {
+      userName,
+      password
+    };
+  }
+
+  function checkValues(userName, password) {
+    return true;
+  }
+
+  function login() {
+    const userDetails = getUserDetails();
+    $.ajax({
+      url: '/login',
+      type: 'post',
+      data: JSON.stringify(userDetails),
+      contentType: 'application/json',
+      success: (data) => {
+        userName = userDetails.userName;
+        password = userDetails.password;
+        renderHome();
+      },
+      error: (err) => {
+        $('#showMessage')[0].innerHTML = 'Wrong login credentials';
+      }
+    });
+  }
+
+  function signup() {
+    const userDetails = getUserDetails();
+    $.ajax({
+      url: '/signup',
+      type: 'post',
+      data: JSON.stringify(userDetails),
+      contentType: 'application/json',
+      success: (data) => {
+        $('#showMessage')[0].innerHTML = 'Login to access';
+      },
+      error: (err) => {
+        $('#showMessage')[0].innerHTML = 'Cannot create user';
+      }
+    });
+  }
+
+  function renderLogin() {
+    $('#body')[0].innerHTML = '<div><input type="text" placeholder="username" id="userName" /><input type="password" placeholder="password" id="password" /><button type="button" onclick="login()">Login</button><button type="button" onclick="signup()">Sign Up</button><div id="showMessage"></div></div>';
+  }
+
+  function renderHome() {
+    $('#body')[0].innerHTML = '<div>' +
+      '<input type="file" id="myFile" accept="image/jpeg, image/png" /> ' +
+      '<input id="photosize" type="number" />' +
+      '<button onclick="uploadImage()"> Submit </button>' +
+      '<div> ' +
+      '<div id="originalSize"> </div> ' +
+      '<div id="changedSize"> </div> ' +
+      '</div> ' +
+      '<div id="result"></div> ' +
+      '</div>';
+  }
+
+  $(document).ready(() => {
+    renderLogin();
+  });
 </script>
-</body>
 </html>
