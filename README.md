@@ -3,6 +3,7 @@
 ## Requirements
 1. Node (version 10.10.0)
 2. NPM (version 6.4.1)
+3. MongoDb
 
 ## Steps to run the app
 1. Clone this repository
