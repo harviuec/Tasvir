@@ -6,11 +6,61 @@
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
 </head>
 <body>
-<div id="body"></div>
+<div id="body">
+</div>
 </body>
 <script>
-  let userName;
-  let password;
+  function getUserDetails() {
+    const userName = document.getElementById('userName').value;
+    const password = document.getElementById('password').value;
+    return {
+      userName,
+      password
+    };
+  }
+
+  function login() {
+    const userDetails = getUserDetails();
+    if (userDetails.password.length < 8) {
+      $('#showMessage')[0].innerHTML = 'password is too short. Make it 8.';
+      return;
+    }
+    $.ajax({
+      url: '/login',
+      type: 'post',
+      data: JSON.stringify(userDetails),
+      contentType: 'application/json',
+      success: (data) => {
+        userName = userDetails.userName;
+        password = userDetails.password;
+        renderHome(data && data.images);
+      },
+      error: (err) => {
+        $('#showMessage')[0].innerHTML = 'Wrong login credentials';
+      }
+    });
+  }
+
+  function signup() {
+    const userDetails = getUserDetails();
+    if (userDetails.password.length < 8) {
+      $('#showMessage')[0].innerHTML = 'password is too short. Make it 8.';
+      return;
+    }
+    $.ajax({
+      url: '/signup',
+      type: 'post',
+      data: JSON.stringify(userDetails),
+      contentType: 'application/json',
+      success: (data) => {
+        $('#showMessage')[0].innerHTML = 'Login to access';
+      },
+      error: (err) => {
+        $('#showMessage')[0].innerHTML = 'Cannot create user';
+      }
+    });
+  }
+
   function uploadImage() {
     const newSize = $('#photosize')[0].value;
     const fileContainer = document.getElementById('myFile');
@@ -18,8 +68,6 @@
     const filedata = new FormData();
     filedata.append('image', file);
     filedata.append('newSize', newSize);
-    filedata.append('userName', userName);
-    filedata.append('password', password);
     if (file) {
       $.ajax({
         url: '/resize',
@@ -40,50 +88,28 @@
     }
   }
 
-  function getUserDetails() {
-    const userName = document.getElementById('userName').value;
-    const password = document.getElementById('password').value;
-    checkValues(userName, password);
-    return {
-      userName,
-      password
-    };
-  }
-
-  function checkValues(userName, password) {
-    return true;
-  }
-
-  function login() {
-    const userDetails = getUserDetails();
+  function checkLoggedIn() {
     $.ajax({
-      url: '/login',
-      type: 'post',
-      data: JSON.stringify(userDetails),
-      contentType: 'application/json',
+      url: '/check',
+      type: 'get',
       success: (data) => {
-        userName = userDetails.userName;
-        password = userDetails.password;
-        renderHome();
+        renderHome(data && data.images);
       },
       error: (err) => {
-        $('#showMessage')[0].innerHTML = 'Wrong login credentials';
+        renderLogin();
       }
     });
   }
 
-  function signup() {
-    const userDetails = getUserDetails();
+  function logout() {
     $.ajax({
-      url: '/signup',
-      type: 'post',
-      data: JSON.stringify(userDetails),
-      contentType: 'application/json',
-      success: (data) => {
-        $('#showMessage')[0].innerHTML = 'Login to access';
+      url: '/logout',
+      type: 'get',
+      success: () => {
+        renderLogin();
       },
       error: (err) => {
-        $('#showMessage')[0].innerHTML = 'Cannot create user';
+        $('#result')[0].innerHTML = 'error in logging out';
       }
     });
   }
@@ -92,21 +118,32 @@
     $('#body')[0].innerHTML = '<div><input type="text" placeholder="username" id="userName" /><input type="password" placeholder="password" id="password" /><button type="button" onclick="login()">Login</button><button type="button" onclick="signup()">Sign Up</button><div id="showMessage"></div></div>';
   }
 
-  function renderHome() {
+  function renderImages(images) {
+    let html = '';
+    for (let i = 0; i < images.length; i++) {
+      html += `<div><img style="height: 100px; width: 100px;" src="${images[i]}"></div>`;
+    }
+    return `<div>${html}</div>`;
+  }
+
+  function renderHome(images) {
+    const imageHtml = images && renderImages(images);
     $('#body')[0].innerHTML = '<div>' +
       '<input type="file" id="myFile" accept="image/jpeg, image/png" /> ' +
       '<input id="photosize" type="number" />' +
       '<button onclick="uploadImage()"> Submit </button>' +
+      '<button onclick="logout()"> logout </button>' +
       '<div> ' +
       '<div id="originalSize"> </div> ' +
       '<div id="changedSize"> </div> ' +
       '</div> ' +
       '<div id="result"></div> ' +
+      imageHtml +
       '</div>';
   }
 
   $(document).ready(() => {
-    renderLogin();
+    checkLoggedIn();
   });
 </script>
 </html>
